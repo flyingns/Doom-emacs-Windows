@@ -1,0 +1,221 @@
+#+TITLE: environment
+
+
+* System
+
+- This configuration used for Windows 10 x64 Pro system.
+
+  Tested on windows 10 1809 x64.
+
+- [[https://github.com/hlissner/doom-emacs/tree/develop][doom-emacs]]
+
+
+* Fonts
+
+- Source Code Pro
+
+- all-the-icons
+
+- dejavu
+
+
+* Emacs
+
+** emacs 26.1 x64
+
+[[https://github.com/m-parashar/emax64/releases/download/20180529/emax64-bin-20180529.7z][emax64]]
+
++ Unzip to ~C:\emacs~
+
++ Add ~C:\emacs\bin~ to system $PATH
+
++ Run ~C:\emacs\bin\addpm.exe~ to creat the shortcut
+
++ Permission ~C:\emacs\bin\runemacs.exe~ run as administrator
+
++ set emacs home directory
+
+#+begin_quote
+
+regedit -->
+        HKEY_LOCAL_MACHINE -->
+                           SOFTWARE -->
+                                    GNU -->
+                                        Emacs -->
+                                              SZ    : HOME
+                                              Value : C:\User\$USERNAME
+
+#+end_quote
+
+** msys64
+
+~Install msys2 after the Git for Windows installed.~
+
++ Install msys2-x86_64 to ~c:/msys64~
+
++ Unzip [[https://github.com/m-parashar/emax64/releases/download/20180529/emax.7z][emax.7z]] and merge to ~c:/msys64~
+
+  Merge emax.7z --> bin
+                --> bin64
+                --> mingw64 to ~c:/msys64~
+
++ Add :
+        C:\msys64
+        C:\msys64\bin
+        C:\msys64\bin64
+        C:\msys64\mingw64\bin
+        C:\msys64\usr\bin
+  to system $PATH.
+
+** elpa local mirror
+
++ Install ~cwRsync~ to ~C:\cwRsync~
+
++ Add ~C:\cwRsync~ to system $PATH
+
++ rsync elpa mirror
+
+  #+BEGIN_SRC shell
+
+    cd ~
+    mkdir elpa
+    rsync -ravz rsync://elpa.emacs-china.org/elpa/ "elpa/"
+
+    or
+
+    rsync -ravz --delete rsync://elpa.emacs-china.org/elpa/ "elpa"
+
+  #+END_SRC
+
++ use the local elpa mirror
+
+  #+BEGIN_SRC emacs-lisp
+
+(setq-default package-archives '(("gnu"   . "~/elpa/gnu/")
+                                 ("org"   . "~/elpa/org/")
+                                 ("melpa" . "~/elpa/melpa/")))
+
+  #+END_SRC
+
+
+* Third-party tools
+
+** TeX Live 2018 20180414
+
+** Git for windows 2.20.1 x64
+
++ During the program process add the path to system $PATH.
+
+  Mark sure Git's $PATH at before the msys2's $PATH. e.g. Git and msys2 both
+  have ediff, but emacs use Git's ediff is good.
+
+** anaconda3 2018.12 x64
+
+~version 2018.12 not use~
+
++ If run pip error :
+
+#+begin_quote
+  distributed 1.21.8 requires msgpack, which is not installed.
+#+end_quote
+
+#+BEGIN_SRC shell
+conda install -c anaconda msgpack-python
+pip install msgpack
+python -m pip install --upgrade pip
+#+END_SRC
+
++ Update anaconda :
+
+#+BEGIN_SRC shell
+
+  conda update --all
+  pip install jedi==0.13.0
+  pip install importmagic epc  autoflake flake8 yapf
+
+#+END_SRC
+
+** GnuPG 1.4.23
+
+Add ~C:\Program Files (x86)\GNU\GnuPG~ to system $PATH.
+
+** ledger
+
+Add ~C:\ledger~ to system $PATH.
+
+** pandoc
+
+Default, pandoc in anaconda3, the version is 1.x, it's too low.
+
+Can update the version of pandoc : unzip pandoc-2.5-windows-x86_64.zip and
+replace to ~C:\ProgramData\Anaconda3\Scripts~ .
+
+[[https://github.com/jgm/pandoc/releases/download/2.5/pandoc-2.5-windows-x86_64.zip][pandoc 2.5]]
+
+** ImageMagick
+
+The emax64 built in.
+
+** PlantUML
+
++ [[https://www.java.com/zh_CN/download/windows_offline.jsp][java]]
+
+  jre-8u191-windows-i586.exe
+
++ [[https://graphviz.gitlab.io/_pages/Download/Download_windows.html][graphviz-dot]]
+
+  + unzip graphviz-2.38.zip to ~C:\graphviz~
+
+  + Environment Variables -> System Variable -> New :
+
+     Variable name : GRAPHVIZ_DOT
+
+     Variable value : C:\graphviz\bin\dot.exe
+
+  + Environment Variables -> System Variable -> path -> Edit -> add :
+
+     C:\graphviz\bin
+
+*** Backup
+
+The following manual operations are not necessary. Now, in doom emacs, use the
+module : lang / plantuml and the function : M-x +plantuml/install to do the same
+thing.
+
++ plantuml.jar
+
+  [[http://plantuml.com/download][plantuml]]
+
+  Put plantuml.jar to : ~/env/plantuml/
+
++ emacs configuration
+
+#+BEGIN_SRC emacs-lisp
+
+(setq org-plantuml-jar-path
+      (expand-file-name "~/env/plantuml/plantuml.jar"))
+
+#+END_SRC
+
+** ispell (module feature / syntax-checker)
+
++ On Windows system , this module will use the command ~look.exe~, it's in msys2.
+And also need a dictionary.
+
++ english words dictionary
+
+  Put ~English-words.txt~ to ~/env/dict/~ .
+
+  Now, in doom emacs, use the quelpa package "dictionary" and the function : M-x
+  +ispell-alternate-dictionary/install to do the same thing.
+
++ config
+
+#+BEGIN_SRC emacs-lisp
+
+(require 'ispell)
+;; emacs-support-directory : ~/env/
+(setq ispell-alternate-dictionary
+      (concat emacs-support-directory "dict/english-words.txt"))
+
+#+END_SRC
